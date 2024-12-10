@@ -1,0 +1,456 @@
+/* General reset for body and html to occupy full viewport height */
+html, body {
+    margin: 0;
+    padding: 10px;
+    height: 100%;
+    overflow: hidden; /* Prevent scrolling */
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    font-size: 24px;
+    border-bottom: 1px solid #ccc;
+}
+
+h1 {
+    margin: 10px;
+    font-size: 24px;
+    text-align: left;
+}
+
+h4 {
+    margin: 10px;
+    text-align: left;
+}
+
+/* Button styling */
+button {
+    padding: 5px 15px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    color: #000000;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ffffff;
+    color: #E2001A
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+    .flex-container {
+        flex-direction: column;
+    }
+
+    .menu-container {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* Flex container layout */
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+    height: 100%;
+    width: 100%;
+}
+
+/* Left column with fixed width */
+.flex-left {
+    flex: 0 0 25%;
+    padding: 5%;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Right column that fills remaining space */
+.flex-right {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 3px;
+    max-height: 60vh;
+
+}
+
+/* Menu container styles */
+.menu-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffffff;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Menu links on the left */
+.menu-left {
+    display: flex;
+    gap: 15px;
+}
+/* Logos container */
+.menu-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.menu-right img:hover {
+    transform: scale(1.1);
+}
+
+/* Individual menu item styling */
+.menu-item {
+    padding: 10px 15px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item a {
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+}
+
+.menu-item a:hover {
+    color: #E2001A;
+}
+
+/* Date slider styling */
+#date-slider .rc-slider {
+    background-color: #ffffff;
+}
+
+#date-slider .rc-slider-track {
+    background-color: #E2001A;
+}
+
+#date-slider .rc-slider-handle {
+    border-color: #E2001A;
+    background-color: #ffffff;
+    height: 20px;
+    width: 20px;
+    margin-top: -9px;
+    border-width: 2px;
+}
+
+#date-slider .rc-slider-dot {
+    border-color: #E2001A;
+}
+
+#date-slider .rc-slider-dot-active {
+    border-color: #E2001A;
+}
+
+#date-slider .rc-slider-marks {
+    margin-top: 10px;
+    border-color: #E2001A;
+}
+
+/* Range slider styling */
+#date-range-slider .rc-slider {
+    background-color: #ffffff;
+    height: 12px;
+    position: relative;
+}
+
+#date-range-slider .rc-slider-track {
+    background-color: #E2001A;
+    height: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#date-range-slider .rc-slider-handle {
+    border-color: #E2001A;
+    background-color: #ffffff;
+    height: 20px;
+    width: 20px;
+    margin-top: -10px;
+    border-width: 2px;
+    cursor: pointer;
+}
+
+#date-range-slider .rc-slider-dot {
+    border-color: #E2001A;
+}
+
+#date-range-slider .rc-slider-dot-active {
+    border-color: #E2001A;
+}
+
+#date-range-slider .rc-slider-mark-text {
+    font-size: 12px;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1.2;
+}
+
+#date-range-slider .rc-slider-marks {
+    border-color: #E2001A;
+}
+
+#date-range-slider .rc-slider-mark {
+    background-color: #E2001A;
+}
+
+
+/* Footer styling */
+.footer {
+    background-color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #000000;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-text {
+    margin: 5px 0;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* General Modal Overlay Styling */
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+/* Modal Visible State */
+.modal.show {
+    display: flex;
+}
+
+/* Modal Content Box */
+.modal-content {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    width: 50%;
+    max-width: 600px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    position: relative;
+    text-align: left;
+    margin-top: 10px;
+}
+
+/* Close Button */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    color: #000000;
+    cursor: pointer;
+}
+
+/* Help Icon */
+.help-icon {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.help-icon:hover {
+    transform: scale(1.1);
+}
+
+/* GitHub Link Styling */
+.github-logo {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.github-logo:hover {
+    transform: scale(1.1);
+}
+
+.image-container {
+    text-align: center;
+    margin: 5px;
+    width: 90px;
+    padding: 5px;
+}
+
+.status-img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    width: 60px;
+    height: 120px;
+}
+
+/* DataTable container styling */
+.data-table-container {
+    position: relative;
+    padding-bottom: 40px;
+}
+
+.export-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: calc(100% - 20px);
+    display: flex;
+    justify-content: flex-start; 
+}
+
+/* Modal styles in Status page */
+.modal_status_legend {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal_status_legend-toggle-button {
+    margin: 30px;
+    padding: 0px 0px;
+    cursor: pointer;
+    width: 150px;
+    height: 30px;
+    margin-left: 0;
+}
+
+/* Styling Dropdown Select component */
+.Select-value-icon {
+    color:#000000;
+    background-color:#ffffff;
+    border-color: #000000;
+}
+
+.Select-value-label {
+    color:#000000;
+    background-color:#ffffff;
+    border-color: #000000;
+}
+
+/* Styling landing page Initial-Modal */
+#initial-modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+#initial-modal .modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+#initial-modal h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333333;
+}
+
+#initial-modal .Select {
+    margin-bottom: 20px;
+}
+
+#confirm-selection-btn {
+    padding: 10px 20px;
+    background-color: #E2001A;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+#confirm-selection-btn:hover {
+    background-color: #bf0016;
+}
+
+#initial-modal.modal.show {
+    display: flex;
+}
+
+#initial-modal.modal {
+    display: none;
+}
