@@ -147,6 +147,5 @@ def update_choropleth(selected_date_index, selected_blood_type):
             'xanchor': 'center',
             'yanchor': 'top'
         },
-        font=dict(size=12),
     )
     return fig

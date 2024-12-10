@@ -8,8 +8,6 @@ dash.register_page(__name__, path="/status")
 
 # Load and prepare data
 df = get_DataFrame()
-
-# Convert 'Date' to datetime and filter missing values
 df['Date'] = pd.to_datetime(df['Date'])
 df = df[df['Canton'].notna() & df['Reserve_Status'].notna()]
 
@@ -36,7 +34,6 @@ status_images = {
 layout = html.Div([
     html.H1('Blood Group Reserve Status', className='H1'),
 
-    # Flex container for slider, dropdown, images, and modal toggle
     html.Div([
         html.Div([
             html.H4('Please select a date:', className='H4'),
@@ -53,14 +50,23 @@ layout = html.Div([
             dcc.Dropdown(
                 id='canton-dropdown-status',
                 options=[{'label': c, 'value': c} for c in df['Canton'].unique()],
-                value=None,#df['Canton'].unique()[2],  # Default selection
+                value=None,
                 multi=False
             ),
             html.Button("Show Legend", id="open-modal-btn", className="modal_status_legend-toggle-button")
         ], className='flex-left'),
 
-        # Right column: Images section
-        html.Div(id="status-images", className='flex-right', style={'display': 'flex', 'justify-content': 'space-evenly'})
+        # Container for title and images
+        html.Div(
+            id="status-images",
+            className='flex-right',
+            style={
+                'display': 'flex', 
+                'flexDirection': 'column', 
+                'alignItems': 'center', 
+                'justifyContent': 'flex-start'
+            }
+        )
     ], className='flex-container'),
 
     # Modal container
@@ -86,6 +92,7 @@ layout = html.Div([
         ]
     ),
 ])
+
 # Callback to set default canton from the stored selection
 @callback(
     Output('canton-dropdown-status', 'value'),
@@ -101,30 +108,40 @@ def set_default_canton(canton):
      Input("canton-dropdown-status", "value")]
 )
 def update_reserve_status_images(selected_date_index, selected_canton):
-    # Get the selected date
     selected_date = available_dates[selected_date_index]
 
-    # Filter the data based on the selected date and canton
     filtered_df = df[
         (df['Date'].dt.date == selected_date) &
         (df['Canton'] == selected_canton)
     ]
 
-    # Check if filtered data is empty
     if filtered_df.empty:
         return [html.P("Please select a canton and a date.", style={'textAlign': 'center'})]
 
-    # Generate image components for each blood type
-    images = [
+    # Construct the title with only date and canton in bold
+    title_element = html.P([
+        "Blood reserves from ",
+        html.B(selected_date.strftime('%d.%m.%Y')),
+        " for ",
+        html.B(selected_canton)
+    ], className='title_element')
+
+    image_elements = [
         html.Div([
-            html.Img(src=status_images[status], style={'height': '150px', 'margin': '5px'}),
+            html.Img(src=status_images[status], style={'height': '120px', 'margin': '5px'}),
             html.P(f"{blood_type} ({status})", style={'textAlign': 'center', 'fontSize': '14px'})
         ], style={'width': '150px', 'textAlign': 'center', 'margin': '5px'})
         for blood_type, status in zip(filtered_df['Blood_Type'], filtered_df['Reserve_Status'])
         if status in status_images
     ]
 
-    return images
+    return [
+        title_element,
+        html.Div(
+            image_elements,
+            style={'display': 'flex', 'flexWrap': 'wrap', 'justifyContent': 'center'}
+        )
+    ]
 
 # Callback to toggle modal visibility
 @callback(
