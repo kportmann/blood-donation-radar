@@ -1,35 +1,22 @@
 import dash
-from dash import html, dcc, callback, Input, Output, dash_table
+from dash import html, dash_table
 import pandas as pd
 import os
 
 # Register the page (if using Dash multipage app framework)
 dash.register_page(__name__, path="/raw_data", name="Data")
 
-# Get the directory of the current file (raw.py)
+# Get the directory
 current_dir = os.path.dirname(__file__)
-
-# Construct the relative path to the CSV file in the data folder
 csv_path = os.path.join(current_dir, "../data/blood_reserve_data.csv")
-
-# Load the CSV file into a DataFrame
 df = pd.read_csv(csv_path)
 
-## Relevant to get the data the way we need it.
+# Prepare the DataFrame
 def get_DataFrame():
-    # Load the data
     df = pd.read_csv(csv_path)
-
-    # Calculate mean values grouped by Canton and Blood_Type, dividing by 7
     mean_df = ((df.groupby(['Canton', 'Blood_Type'])['Demand_in_Liter'].mean() / 7).round(2)).reset_index()
-
-    # Rename column in mean_df for clarity
     mean_df.rename(columns={'Demand_in_Liter': 'Mean_Demand_Per_Day'}, inplace=True)
-
-    # Merge the mean_df back into the original df for proper alignment
     df = df.merge(mean_df, on=['Canton', 'Blood_Type'])
-
-    # Calculate the 'Enough_for_x_Days' column
     df['Enough_for_x_Days'] = (df['Blood_in_Liter'] / df['Mean_Demand_Per_Day']).round(2)
 
     # Define classify function
@@ -57,8 +44,6 @@ data = get_DataFrame()
 # Layout for the data table
 layout = html.Div([
     html.H1("Raw Data Overview"),
-
-    # DataTable container
     html.Div(
         children=[
             dash_table.DataTable(

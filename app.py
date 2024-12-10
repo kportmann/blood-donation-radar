@@ -1,7 +1,5 @@
 import dash
-import pandas as pd
 from dash import Dash, html, dcc, Input, Output, State
-
 
 
 app = Dash(__name__, use_pages=True)
@@ -10,10 +8,9 @@ from pages.raw_data import get_DataFrame
 df = get_DataFrame()
 
 app.layout = html.Div([
-    # Header Section
     html.Div(
         html.H1('Blood Donation Radar Switzerland'),
-        className='header'  # Header section
+        className='header'
     ),
     html.Div(
         id="initial-modal",
@@ -22,7 +19,7 @@ app.layout = html.Div([
             html.Div(
                 className="modal-content",
                 children=[
-                    html.H2("Where do you live and what's your Bloodtpye?"),
+                    html.H2("In which canton do you live and what's your Blood type?"),
                     dcc.Dropdown(
                         id="canton-selection",
                         options=[{'label': c, 'value': c} for c in df['Canton'].unique()],
@@ -39,12 +36,12 @@ app.layout = html.Div([
         ]
     ),
 
-    # Speicher für Auswahl
+    # Store for selected values
     dcc.Store(id='selected-canton-store'),
     dcc.Store(id='selected-blood-type-store'),
 
     
-    # Navigation Menu
+    # Navigation menu
     html.Div([
         html.Div(
             [
@@ -52,7 +49,7 @@ app.layout = html.Div([
                     dcc.Link(f"{page['name']}", href=page["relative_path"]),
                     className='menu-item'
                 ) 
-                for page_name in ['Map', 'Status', 'Graph', 'Data']  # Manual order of pages
+                for page_name in ['Map', 'Status', 'Graph', 'Data'] # Define the order of the pages manually
                 for page in dash.page_registry.values() if page['name'] == page_name
             ],
             className='menu-left'
@@ -67,7 +64,7 @@ app.layout = html.Div([
                     id="github-logo",
                     style={'width': '35px', 'height':'35px'},
                 ),
-                href="https://github.com/kportmann/blood-donation-radar",  # GitHub repo URL
+                href="https://github.com/kportmann/blood-donation-radar",
                 target="_blank",
             ),
             html.A(
@@ -120,8 +117,8 @@ app.layout = html.Div([
     
     # Main Content
     html.Div(
-        dash.page_container,  # Content container
-        className='content-flexbox'  # Flexbox for the content
+        dash.page_container,
+        className='content-flexbox'
     ),
     
     # Footer Section
@@ -132,9 +129,9 @@ app.layout = html.Div([
         ], className='footer-content'),
         className='footer'
     )
-], className='app-container')  # Overall container
+], className='app-container')
 
-# Callback to toggle the modal visibility and speichern der Auswahl
+# Callback initial modal
 @app.callback(
     [Output("initial-modal", "className"),
      Output("selected-canton-store", "data"),
@@ -148,7 +145,7 @@ def close_modal_and_set_defaults(n_clicks, canton, blood_type):
     return "modal", canton, blood_type
 
 
-# Callback to toggle the modal visibility
+# Callback info box
 @app.callback(
     Output("modal", "className"),
     [Input("help-icon", "n_clicks"), 

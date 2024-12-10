@@ -38,7 +38,6 @@ layout = html.Div([
 
     # Flex container for slider, dropdown, images, and modal toggle
     html.Div([
-        # Left column: Filters
         html.Div([
             html.H4('Please select a date:', className='H4'),
             dcc.Slider(
