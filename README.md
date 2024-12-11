@@ -9,8 +9,13 @@
 ## Introduction
 
 Welcome to the Blood Donation Radar - Switzerland Dashboard! <br>
-We, Benjamin and Kevin, are students in direction Artificial Intelligence and Mashine Learning at the HSLU and this is our project for the module Data Visualization.
-The project contains a Dashboard ....
+We are Benjamin and Kevin, students specialising in Artificial Intelligence and Machine Learning at HSLU. This is our Data Visualisation project. <br>
+<br>
+The idea for the project came by visiting the offical homepage of the Blutspende SRK Schweiz (https://www.blutspende.ch/de/blutspende), where they show a barometer for a region of Switzerland. <br>
+<br>
+We extended this information by creating the dashboard, which includes a Switzerland map and some graph views. <br>
+<br>
+We used <b>synthesised data</b> for the project, so please be aware this project is only for visualisation purposes and <b>contains no official data</b>!
 
 ## Walkthrough
 To show you the main features, here is a quick walkthrough of our dashboard.
@@ -47,12 +52,15 @@ The datatable can be found here and can also be exported as a CSV file. <br>
 
 ## To run the app locally
 To run the Dashboard locally, you can clone this repository and run the app:
+
 ```bash
 git clone https://github.com/kportmann/blood-donation-radar.git
 cd blood-donation-radar
-python3 -m venv venv && . venv/bin/activate
+python3 -m venv venv
+. venv/bin/activate
 pip install -r requirements.txt
 python3 app.py
 ```
+
 ### Have fun trying out!
 
