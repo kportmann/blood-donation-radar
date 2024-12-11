@@ -39,7 +39,7 @@ Displays the status of blood reserves by canton for all blood groups.<br>
 </p>
 
 ### Graph view
-Shows graphs for all blood groups and by selected cantons for a selected time period. The threshold line makes it easy to see on which dates the blood shortage occurred. <br>
+This graph shows the blood shortage for selected blood groups and cantons over a specific time period. The threshold line makes it easy to see when the blood shortage occurred. <br>
 <p align="center">
     <img src="demo/graphView.gif" alt="map view" width="1000">
 </p>
