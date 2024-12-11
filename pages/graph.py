@@ -1,10 +1,8 @@
 import dash
-from dash import html, dcc, callback, Input, Output
-from dash.dependencies import Input, Output
+from dash import html, dcc, callback, Input, Output, State
 import pandas as pd
 import plotly.graph_objects as go
 from .raw_data import get_DataFrame
-
 
 # Register the page
 dash.register_page(__name__, path="/graph")
@@ -19,9 +17,7 @@ df = df[df['Canton'].notna() & df['Demand_in_Liter'].notna()]
 # Prepare date range slider marks
 available_dates = sorted(df['Date'].dt.date.unique())
 date_indices = {
-    i: date.strftime('%b %Y')  # Display only the month
-    for i, date in enumerate(available_dates)
-    if date.day <= 7 and (date.month in [6, 12])
+    i: date.strftime('%b %Y') for i, date in enumerate(available_dates) if date.day <= 7 and (date.month in [6, 12])
 }
 min_date_index = 0
 max_date_index = len(available_dates) - 1
@@ -32,6 +28,7 @@ layout = html.Div([
 
     # Flex container for filters and graph
     html.Div([
+        # Left column: Filters
         html.Div([
             html.H4('Select Date Range:', className='H4'),
             dcc.RangeSlider(
@@ -47,22 +44,26 @@ layout = html.Div([
             dcc.Dropdown(
                 id="canton-dropdown-graph",
                 options=[{'label': c, 'value': c} for c in df['Canton'].unique()],
-                value=None,#[df['Canton'].unique()[2]],  # 2 = LU
+                value=None,
+                multi=True,
+            ),
+            html.H4('Select Blood Types:', className='H4'),
+            dcc.Dropdown(
+                id="blood-type-dropdown-graph",
+                options=[{'label': b, 'value': b} for b in df['Blood_Type'].unique()],
+                value=None,
                 multi=True,
             ),
             html.Button("Show Legend", id="open-modal-btn", className="modal_status_legend-toggle-button"),
         ], className='flex-left'),
 
-        # Right column: Graphs
+        # Right column: Single Graph
         html.Div([
-            dcc.Graph(id="graph-A", style={'height': '50%', 'width': '100%'}),
-            dcc.Graph(id="graph-B", style={'height': '50%', 'width': '100%'}),
-            dcc.Graph(id="graph-O", style={'height': '50%', 'width': '100%'}),
-            dcc.Graph(id="graph-AB", style={'height': '50%', 'width': '100%'}),
+            dcc.Graph(id="combined-graph", style={'height': '100%', 'width': '100%'}),
         ], className='flex-right'),
     ], className='flex-container'),
 
-# Modal container
+    # Modal container
     html.Div(
         id="legend-modal",
         className="modal_status_legend",
@@ -77,9 +78,10 @@ layout = html.Div([
                         html.Li([
                             "How many days is the Bloodreserve sufficient at specific date",
                             html.Ul([
-                                html.Li([html.Strong("blue", style={'color': 'blue'}), ": positive Bloodtypes"]),
-                                html.Li([html.Strong("red", style={'color': 'red'}), ": negative Bloodtypes"]),
-                                html.Li([html.Strong("Shortage", style={'color': 'pink'}), ": <4 days"])
+                                html.Li([html.Strong("Recomendation"), ": if you are displaying more than 2 blood types, consider to focus on smaller timeperiods, otherwise the dashboard will be cluttered."]),
+                                html.Li([html.Strong("darker colors", style={'color': '#4f4f4f'}), ": positive Bloodtypes"]),
+                                html.Li([html.Strong("lighter colors", style={'color': '#828282'}), ": negative Bloodtypes"]),
+                                html.Li([html.Strong("Shortage", style={'color': '#ed8a8a'}), ": <4 days"])
                             ])
                         ])
                     ])
@@ -89,25 +91,35 @@ layout = html.Div([
     ),
 ])
 
+# Callback to set default canton from the stored selection
 @callback(
     Output('canton-dropdown-graph', 'value'),
     Input('selected-canton-store', 'data')
 )
 def set_default_canton(canton):
-    return canton if canton else df['Canton'].unique()[0]
+    return [canton] if canton else [df['Canton'].unique()[0]]
 
-# Callback for the graphs
-@dash.callback(
-    [Output("graph-A", "figure"),
-     Output("graph-B", "figure"),
-     Output("graph-O", "figure"),
-     Output("graph-AB", "figure")],
+# Callback to set default blood type from the stored selection
+@callback(
+    Output('blood-type-dropdown-graph', 'value'),
+    Input('selected-blood-type-store', 'data')
+)
+def set_default_blood_type(blood_type):
+    return [blood_type] if blood_type else [df['Blood_Type'].unique()[0]]
+
+# Callback for the combined graph
+@callback(
+    Output("combined-graph", "figure"),
     [Input("canton-dropdown-graph", "value"),
+     Input("blood-type-dropdown-graph", "value"),
      Input("date-range-slider", "value")]
 )
-def update_graphs(selected_cantons, selected_date_range):
+def update_combined_graph(selected_cantons, selected_blood_types, selected_date_range):
+    # Ensure selected_cantons and selected_blood_types are lists
     if isinstance(selected_cantons, str):
         selected_cantons = [selected_cantons]
+    if isinstance(selected_blood_types, str):
+        selected_blood_types = [selected_blood_types]
 
     # Get the selected date range from the slider
     start_date_index, end_date_index = selected_date_range
@@ -117,89 +129,89 @@ def update_graphs(selected_cantons, selected_date_range):
     # Filter the data
     filtered_df = df[
         (df['Canton'].isin(selected_cantons)) &
+        (df['Blood_Type'].isin(selected_blood_types)) &
         (df['Date'].dt.date >= start_date) &
         (df['Date'].dt.date <= end_date)
     ]
 
-    # Check if filtered data is empty
+    # Create an empty figure if no data is available
     if filtered_df.empty:
         empty_fig = go.Figure()
-        empty_fig.update_layout(
-            title='No data available for the selected filters.',
-        )
-        return empty_fig, empty_fig, empty_fig, empty_fig
+        empty_fig.update_layout(title='No data available for the selected filters.')
+        return empty_fig
 
-    # Define blood type groups
-    blood_type_groups = {
-        "A": ["A+", "A-"],
-        "B": ["B+", "B-"],
-        "0": ["0+", "0-"],
-        "AB": ["AB+", "AB-"]
+    # Define unique colors for each blood type
+    blood_type_colors = {
+    "A+": "#E41A1C",   # Dark Red
+    "A-": "#F48FB1",   # Light Red (Pinkish)
+
+    "B+": "#377EB8",   # Dark Blue
+    "B-": "#9ECAE1",   # Light Blue
+
+    "0+": "#4DAF4A",   # Dark Green
+    "0-": "#A1D99B",   # Light Green
+
+    "AB+": "#FF7F00",  # Dark Orange
+    "AB-": "#FDBF6F"   # Light Orange
     }
 
-    figures = []
-    for group, subtypes in blood_type_groups.items():
-        # Filter by blood type group
-        group_df = filtered_df[filtered_df['Blood_Type'].isin(subtypes)]
+    # Create the figure for the combined blood types
+    fig = go.Figure()
+    for blood_type in selected_blood_types:
+        blood_type_df = filtered_df[filtered_df['Blood_Type'] == blood_type]
+        aggregated_df = blood_type_df.groupby('Date').mean(numeric_only=True).round(1).reset_index()
 
-        # Aggregate data by date and blood type
-        aggregated_df = (group_df.groupby(['Date', 'Blood_Type']).mean(numeric_only=True)).round(1).reset_index()
-
-        # Create the figure for the group
-        fig = go.Figure()
-        for subtype in subtypes:
-            subtype_df = aggregated_df[aggregated_df['Blood_Type'] == subtype]
-            fig.add_trace(go.Scatter(
-                x=subtype_df['Date'],
-                y=subtype_df['Enough_for_x_Days'],
-                mode='lines+markers',
-                name=subtype,
-                #line=dict(color='black' if '+' in subtype else '#FF6961')
-            ))
-
-        # Add the threshold line
-        threshold = 4
         fig.add_trace(go.Scatter(
-            x=aggregated_df['Date'].unique(),
-            y=[threshold] * len(aggregated_df['Date'].unique()),
-            mode='lines',
-            line=dict(color='#E2001A', dash='dash'),
-            name='Threshold'
+            x=aggregated_df['Date'],
+            y=aggregated_df['Enough_for_x_Days'],
+            mode='lines+markers',
+            name=blood_type,
+            line=dict(color=blood_type_colors.get(blood_type, '#000000')),  # Default to black if color not found
+            marker=dict(color=blood_type_colors.get(blood_type, '#000000'))
         ))
 
-        # Add the critical zone
-        fig.add_trace(go.Scatter(
-            x=aggregated_df['Date'].tolist() + aggregated_df['Date'].tolist()[::-1],
-            y=[0] * len(aggregated_df) + [threshold] * len(aggregated_df),
-            fill='toself',
-            fillcolor='rgba(2550, 0, 0, 0.2)',
-            line=dict(width=0),
-            showlegend=True,
-            name='Critical Zone'
-        ))
+    # Add the threshold line
+    threshold = 4
+    fig.add_trace(go.Scatter(
+        x=aggregated_df['Date'].unique(),
+        y=[threshold] * len(aggregated_df['Date'].unique()),
+        mode='lines',
+        line=dict(color='#E2001A', dash='dash'),
+        name='Threshold'
+    ))
 
-        # Customize layout
-        fig.update_layout(
-            title=f'<b>Blood Types: {group} +- </b>',
-            xaxis_title='Date',
-            yaxis_title='Days',
-            hovermode='x unified',
-            height=400,
-            plot_bgcolor='white',
-            paper_bgcolor='white',
-            xaxis=dict(showline=True,
+    # Add the critical zone
+    fig.add_trace(go.Scatter(
+        x=aggregated_df['Date'].tolist() + aggregated_df['Date'].tolist()[::-1],
+        y=[0] * len(aggregated_df) + [threshold] * len(aggregated_df),
+        fill='toself',
+        fillcolor='rgba(255, 0, 0, 0.2)',
+        line=dict(width=0),
+        showlegend=True,
+        name='Critical Zone'
+    ))
+
+    # Customize layout
+    fig.update_layout(
+        title='<b>Blood Reserves Over Time</b>',
+        xaxis_title='Date',
+        yaxis_title='Days',
+        hovermode='x unified',
+        height=500,
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        xaxis=dict(showline=True,
                        linecolor='#cccccc',
                        linewidth=2,
                        showgrid=True,
-                       gridcolor='lightgrey',
-                       gridwidth=0.5),
-            yaxis=dict(showline=True,
+                       gridcolor='#f5f5f5',
+                       gridwidth=0.3),
+        yaxis=dict(showline=True,
                         linecolor='#cccccc',
                         linewidth=2,
                         showgrid=True,
-                        gridcolor='lightgrey',
-                        gridwidth=0.5),
-        )
-        figures.append(fig)
+                        gridcolor='#f5f5f5',
+                        gridwidth=0.3)
+    )
 
-    return figures[0], figures[1], figures[2], figures[3]
+    return fig

@@ -83,11 +83,11 @@ layout = html.Div([
                     html.Span("×", id="close-modal-btn", className="close-button"),
                     html.H3("Color-Legend"),
                     html.Ul([
-                        html.Li([html.Strong("green", style={'color': 'green'}),": >10 days (Status: High)"]),
-                        html.Li([html.Strong("lightgreen", style={'color': 'lightgreen'}),": 6-10 days (Status: Normal)"]),
-                        html.Li([html.Strong("yellow/orange", style={'color': 'orange'}),": 4-6 days (Status: Low)"]),
-                        html.Li([html.Strong("red", style={'color': 'red'}),": 2-4 days (Status: Critical)"]),
-                        html.Li([html.Strong("darkred", style={'color': 'darkred'}),": <2 days (Status: Extremely Critical)"]),
+                        html.Li([html.Strong("green", style={'color': '#1fad09'}),": >10 days (Status: High)"]),
+                        html.Li([html.Strong("lightgreen", style={'color': '#72e670'}),": 6-10 days (Status: Normal)"]),
+                        html.Li([html.Strong("yellow/orange", style={'color': '#f5ac1b'}),": 4-6 days (Status: Low)"]),
+                        html.Li([html.Strong("red", style={'color': '#de3c3c'}),": 2-4 days (Status: Critical)"]),
+                        html.Li([html.Strong("darkred", style={'color': '#a80202'}),": <2 days (Status: Extremely Critical)"]),
                     ])
                 ]
             )
@@ -123,11 +123,11 @@ def update_choropleth(selected_date_index, selected_blood_type):
         text=filtered_df['Enough_for_x_Days'].astype(str) + " Days",
         hoverinfo="location+z",
         colorscale=[
-            [0, "darkred"],
-            [0.1, "red"],
-            [0.3, "yellow"],
-            [0.5, "green"],
-            [1, "darkgreen"]
+        [0, "#8B0000"],      # Dark Red (more alarming red)
+        [0.1, "#DC143C"],    # Crimson (more intense red)
+        [0.3, "#FFD700"],    # Muted yellow
+        [0.5, "#32CD32"],    # Muted green
+        [1, "#006400"]       # Dark muted green
         ],
         zmin=2,
         zmax=20,
